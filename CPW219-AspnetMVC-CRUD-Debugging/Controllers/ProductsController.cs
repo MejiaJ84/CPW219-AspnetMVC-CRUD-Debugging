@@ -31,7 +31,8 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _context.AddAsync(product);
+                _context.Add(product);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
@@ -39,7 +40,7 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
 
         public async Task<IActionResult> Edit(int id)
         {
-            var product = await _context.Product.FindAsync(id);
+            Product product = await _context.Product.FindAsync(id);
             if (product == null)
             {
                 return NotFound();
@@ -52,7 +53,7 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Update(product);
+                _context.Product.Update(product);
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index));
@@ -77,7 +78,13 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var product = await _context.Product.FindAsync(id);
-            _context.Product.Remove(product);
+            if (ProductExists(product.ProductId))
+            {
+                _context.Product.Remove(product);
+                _context.SaveChanges();
+                return RedirectToAction(nameof(Index));
+            }
+           
             return RedirectToAction(nameof(Index));
         }
 
